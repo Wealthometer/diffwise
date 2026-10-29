@@ -1,0 +1,16 @@
+description: Offset uses page * size with 1-based pages, so page 1 skips the first page of results.
+files:
+  - path: src/api/list.ts
+    patch: |
+      @@ -10,4 +10,9 @@ const PAGE_SIZE = 20
+       
+      +// page is 1-based: ?page=1 is the first page
+      +export async function listProducts(page: number) {
+      +  const offset = page * PAGE_SIZE
+      +  return db.query("SELECT * FROM products ORDER BY id LIMIT $1 OFFSET $2", [PAGE_SIZE, offset])
+      +}
+expected:
+  - path: src/api/list.ts
+    on_any_line_containing:
+      - "const offset = page * PAGE_SIZE"
+    category: bug

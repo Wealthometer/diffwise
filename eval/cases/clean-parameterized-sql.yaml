@@ -1,0 +1,13 @@
+description: SQL with placeholders — safe. Trap for naive "SELECT + variable" checks.
+expected: []
+files:
+  - path: src/orders.ts
+    patch: |
+      @@ -1,4 +1,9 @@
+       import { pool } from "./db"
+       
+      +export async function ordersFor(customerId: string) {
+      +  const sql = "SELECT id, total FROM orders WHERE customer_id = $1 ORDER BY created_at DESC"
+      +  const { rows } = await pool.query(sql, [customerId])
+      +  return rows
+      +}

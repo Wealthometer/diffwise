@@ -1,0 +1,13 @@
+description: Swapping print for structured logging, with errors handled.
+expected: []
+files:
+  - path: app/worker.py
+    patch: |
+      @@ -8,6 +8,9 @@ def process(job):
+           try:
+               handle(job)
+           except TimeoutError as exc:
+      -        print("timeout", job.id)
+      +        log.warning("job timed out", extra={"job_id": job.id, "error": str(exc)})
+      +        raise
+      +    log.info("job done", extra={"job_id": job.id})

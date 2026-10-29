@@ -1,0 +1,16 @@
+description: Assignment instead of comparison grants admin to everyone.
+files:
+  - path: src/auth/guard.js
+    patch: |
+      @@ -3,6 +3,9 @@ module.exports = function requireAdmin(req, res, next) {
+         const user = req.user
+         if (!user) return res.sendStatus(401)
+      +  if (user.role = "admin") {
+      +    return next()
+      +  }
+         res.sendStatus(403)
+       }
+expected:
+  - path: src/auth/guard.js
+    on_any_line_containing:
+      - "if (user.role = \"admin\")"

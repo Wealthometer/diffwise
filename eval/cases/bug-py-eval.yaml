@@ -1,0 +1,16 @@
+description: User-supplied expression is evaluated.
+files:
+  - path: app/calc.py
+    patch: |
+      @@ -1,2 +1,6 @@
+       from flask import request
+       
+      +@app.post("/calc")
+      +def calc():
+      +    return {"result": eval(request.json["expr"])}
+      +
+expected:
+  - path: app/calc.py
+    on_any_line_containing:
+      - "eval(request.json"
+    category: security

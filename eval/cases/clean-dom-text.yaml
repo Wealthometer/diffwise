@@ -1,0 +1,12 @@
+description: Safe DOM updates (textContent, clearing innerHTML). Trap for XSS checks.
+expected: []
+files:
+  - path: web/search.js
+    patch: |
+      @@ -10,3 +10,7 @@ const params = new URLSearchParams(location.search)
+       
+       const banner = document.getElementById("banner")
+      +banner.innerHTML = ""
+      +const strong = document.createElement("b")
+      +strong.textContent = params.get("q") ?? ""
+      +banner.append("Results for ", strong)

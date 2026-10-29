@@ -1,0 +1,19 @@
+description: Failure to persist an order is swallowed and reported as success.
+files:
+  - path: src/checkout.ts
+    patch: |
+      @@ -22,4 +22,9 @@ export async function placeOrder(cart: Cart) {
+         const order = buildOrder(cart)
+      -  await orders.save(order)
+      +  try {
+      +    await orders.save(order)
+      +  } catch (e) {}
+      +  await email.sendConfirmation(order)
+         return { ok: true, id: order.id }
+       }
+expected:
+  - path: src/checkout.ts
+    on_any_line_containing:
+      - "} catch (e) {}"
+      - "await orders.save(order)"
+    category: reliability

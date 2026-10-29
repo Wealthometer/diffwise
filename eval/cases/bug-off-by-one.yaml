@@ -1,0 +1,18 @@
+description: Loop bound reads one element past the end of the array.
+files:
+  - path: src/cart.ts
+    patch: |
+      @@ -8,6 +8,11 @@ export type Item = { price: number; qty: number }
+       
+       export function cartTotal(items: Item[]): number {
+         let total = 0
+      +  for (let i = 0; i <= items.length; i++) {
+      +    total += items[i].price * items[i].qty
+      +  }
+      +  return total
+      +}
+expected:
+  - path: src/cart.ts
+    on_any_line_containing:
+      - "i <= items.length"
+    category: bug

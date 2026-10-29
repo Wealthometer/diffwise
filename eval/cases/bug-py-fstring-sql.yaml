@@ -1,0 +1,17 @@
+description: Python f-string SQL with user input.
+files:
+  - path: app/repo.py
+    patch: |
+      @@ -20,4 +20,8 @@ class UserRepo:
+           def __init__(self, conn):
+               self.conn = conn
+      +
+      +    def by_email(self, email):
+      +        cur = self.conn.cursor()
+      +        cur.execute(f"SELECT id, name FROM users WHERE email = '{email}'")
+      +        return cur.fetchone()
+expected:
+  - path: app/repo.py
+    on_any_line_containing:
+      - "cur.execute(f"
+    category: security

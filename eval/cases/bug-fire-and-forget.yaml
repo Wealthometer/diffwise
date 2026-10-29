@@ -1,0 +1,18 @@
+description: forEach with an async callback does not wait; the function returns before items are saved and errors are unhandled.
+files:
+  - path: src/import.ts
+    patch: |
+      @@ -4,4 +4,9 @@ import { save } from "./store"
+       
+      +export async function importAll(rows: Row[]) {
+      +  rows.forEach(async (row) => {
+      +    await save(normalize(row))
+      +  })
+      +  return { imported: rows.length }
+      +}
+expected:
+  - path: src/import.ts
+    on_any_line_containing:
+      - "rows.forEach(async"
+      - "return { imported"
+    category: bug

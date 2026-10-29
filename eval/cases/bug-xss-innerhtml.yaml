@@ -1,0 +1,15 @@
+description: A query-string value is written into the DOM as HTML.
+files:
+  - path: web/search.js
+    patch: |
+      @@ -10,3 +10,6 @@ const params = new URLSearchParams(location.search)
+       
+       const banner = document.getElementById("banner")
+      +const term = params.get("q") ?? ""
+      +banner.innerHTML = `Results for <b>${term}</b>`
+      +
+expected:
+  - path: web/search.js
+    on_any_line_containing:
+      - "banner.innerHTML"
+    category: security

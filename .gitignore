@@ -1,0 +1,11 @@
+node_modules/
+dist/
+coverage/
+.env
+.env.*
+!.env.example
+*.pem
+eval/results/*.json
+!eval/results/.gitkeep
+*.log
+.DS_Store

@@ -1,0 +1,14 @@
+description: Live Stripe secret key committed.
+files:
+  - path: src/billing/stripe.ts
+    patch: |
+      @@ -1,3 +1,4 @@
+       import Stripe from "stripe"
+      -export const stripe = new Stripe(process.env.STRIPE_KEY!)
+      +const STRIPE_SECRET = "sk_live_51NcZqKLm4Abcdefghijklmnopqrstu"
+      +export const stripe = new Stripe(STRIPE_SECRET)
+expected:
+  - path: src/billing/stripe.ts
+    on_any_line_containing:
+      - "sk_live_"
+    category: security

@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Typecheck, test, eval gate, build
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: diffwise_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      TEST_DATABASE_URL: postgres://postgres:postgres@localhost:5432/diffwise_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - name: Eval gate (built-in rules must stay precise and quiet)
+        run: npm run eval -- --min-precision 1 --max-clean-noise 0
+      - name: Eval gate (recorded model responses, if any are committed)
+        run: |
+          latest=$(ls -t eval/recordings/*.json 2>/dev/null | head -1 || true)
+          if [ -n "$latest" ]; then npm run eval -- --provider replay --recording "$latest" --min-precision 0.8 --min-recall 0.7 --max-clean-noise 0.2; else echo "No recordings committed; skipping."; fi
+      - run: npm run build
+
+  docker:
+    name: Build Docker image
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          tags: diffwise:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

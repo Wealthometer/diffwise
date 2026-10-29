@@ -1,0 +1,53 @@
+# cp .env.example .env, fill in the GitHub App values, then: docker compose up -d --build
+# Expose port 3000 publicly (or via a tunnel) so GitHub can deliver webhooks.
+
+x-app: &app
+  build: .
+  image: diffwise
+  restart: unless-stopped
+  env_file: .env
+  environment:
+    NODE_ENV: production
+    DATABASE_URL: postgres://diffwise:${POSTGRES_PASSWORD:-diffwise}@postgres:5432/diffwise
+  depends_on:
+    postgres: { condition: service_healthy }
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: diffwise
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-diffwise}
+      POSTGRES_DB: diffwise
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U diffwise"]
+      interval: 5s
+      retries: 10
+
+  migrate:
+    <<: *app
+    restart: "no"
+    command: ["node", "dist/db/migrate.js"]
+
+  web:
+    <<: *app
+    command: ["node", "dist/main-web.js"]
+    ports: ["${PORT:-3000}:3000"]
+    environment:
+      NODE_ENV: production
+      PORT: "3000"
+      DATABASE_URL: postgres://diffwise:${POSTGRES_PASSWORD:-diffwise}@postgres:5432/diffwise
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+
+  worker:
+    <<: *app
+    command: ["node", "dist/main-worker.js"]
+    stop_grace_period: 30s
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+
+volumes:
+  pgdata:

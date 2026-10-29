@@ -1,0 +1,14 @@
+description: Pure rename refactor. Nothing to report.
+expected: []
+files:
+  - path: src/pricing.ts
+    patch: |
+      @@ -3,9 +3,9 @@ import { TAX_RATE } from "./constants"
+       
+      -export function calc(p: number, q: number) {
+      -  const sub = p * q
+      -  return sub + sub * TAX_RATE
+      +export function lineTotal(unitPrice: number, quantity: number) {
+      +  const subtotal = unitPrice * quantity
+      +  return subtotal + subtotal * TAX_RATE
+       }

@@ -1,0 +1,13 @@
+description: Test fixtures with obviously fake credentials.
+expected: []
+files:
+  - path: test/auth.test.ts
+    patch: |
+      @@ -1,3 +1,8 @@
+       import { login } from "../src/auth"
+       
+      +test("rejects a wrong password", async () => {
+      +  const password = "correct-horse-battery"
+      +  await expect(login("ada@example.com", password + "x")).rejects.toThrow("Invalid")
+      +})
+      +

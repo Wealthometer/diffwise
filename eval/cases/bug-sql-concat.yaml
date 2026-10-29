@@ -1,0 +1,16 @@
+description: Query built by concatenating a request parameter.
+files:
+  - path: src/orders.ts
+    patch: |
+      @@ -1,4 +1,8 @@
+       import { pool } from "./db"
+       
+      +export async function ordersFor(req) {
+      +  const sql = "SELECT * FROM orders WHERE customer = '" + req.query.customer + "'"
+      +  return (await pool.query(sql)).rows
+      +}
+expected:
+  - path: src/orders.ts
+    on_any_line_containing:
+      - "const sql = \"SELECT"
+    category: security

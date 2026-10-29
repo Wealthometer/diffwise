@@ -1,0 +1,19 @@
+description: An async lookup is used without await, so the null check never fires.
+files:
+  - path: src/routes/profile.ts
+    patch: |
+      @@ -12,7 +12,12 @@ router.get("/profile/:id", async (req, res) => {
+         const id = req.params.id
+      -  res.json(await users.findById(id))
+      +  const user = users.findById(id)
+      +  if (!user) {
+      +    return res.status(404).json({ error: "Not found" })
+      +  }
+      +  res.json({ name: user.name, email: user.email })
+       })
+expected:
+  - path: src/routes/profile.ts
+    on_any_line_containing:
+      - "const user = users.findById(id)"
+      - "if (!user) {"
+    category: bug

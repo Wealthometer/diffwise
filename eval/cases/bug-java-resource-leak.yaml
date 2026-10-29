@@ -1,0 +1,19 @@
+description: Stream is never closed (no try-with-resources), leaking file handles.
+files:
+  - path: src/main/java/com/acme/Report.java
+    patch: |
+      @@ -30,5 +30,11 @@ public class Report {
+           private final Path dir;
+       
+      +    public String firstLine(String name) throws IOException {
+      +        BufferedReader reader = new BufferedReader(new FileReader(dir.resolve(name).toFile()));
+      +        String line = reader.readLine();
+      +        return line == null ? "" : line.trim();
+      +    }
+      +
+       }
+expected:
+  - path: src/main/java/com/acme/Report.java
+    on_any_line_containing:
+      - "BufferedReader reader = new BufferedReader"
+    category: reliability

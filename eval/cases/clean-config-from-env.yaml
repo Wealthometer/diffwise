@@ -1,0 +1,13 @@
+description: Credentials read from the environment. Trap for secret detectors keyed on the word "password".
+expected: []
+files:
+  - path: src/config.ts
+    patch: |
+      @@ -1,5 +1,9 @@
+       export const config = {
+         port: Number(process.env.PORT ?? 3000),
+      +  db: {
+      +    user: process.env.DB_USER ?? "app",
+      +    password: process.env.DB_PASSWORD ?? "",
+      +  },
+       }

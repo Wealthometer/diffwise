@@ -1,0 +1,10 @@
+description: UI copy that happens to start with "Select". Trap for SQL-keyword checks.
+expected: []
+files:
+  - path: src/components/picker.ts
+    patch: |
+      @@ -6,3 +6,6 @@ export function placeholder(kind: string) {
+       
+      +export function placeholderFor(kind: string) {
+      +  return "Select a " + kind + " to continue"
+      +}

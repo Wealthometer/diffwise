@@ -1,0 +1,10 @@
+description: Documentation change.
+expected: []
+files:
+  - path: docs/setup.md
+    patch: |
+      @@ -4,3 +4,6 @@ Run the app with `npm start`.
+       
+      +## Environment
+      +
+      +Set `DATABASE_URL` and `REDIS_URL` before starting. Never commit real passwords.

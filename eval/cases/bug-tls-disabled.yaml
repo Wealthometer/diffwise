@@ -1,0 +1,17 @@
+description: Certificate verification turned off for an outbound client.
+files:
+  - path: src/payments/client.ts
+    patch: |
+      @@ -1,5 +1,7 @@
+       import https from "node:https"
+       
+      -export const agent = new https.Agent({ keepAlive: true })
+      +export const agent = new https.Agent({
+      +  keepAlive: true,
+      +  rejectUnauthorized: false,
+      +})
+expected:
+  - path: src/payments/client.ts
+    on_any_line_containing:
+      - "rejectUnauthorized: false"
+    category: security

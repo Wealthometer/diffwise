@@ -1,0 +1,21 @@
+description: Check-then-act on a balance outside a transaction allows double spending under concurrency.
+files:
+  - path: src/wallet.ts
+    patch: |
+      @@ -5,4 +5,12 @@ import { db } from "./db"
+       
+      +export async function withdraw(userId: string, amount: number) {
+      +  const { rows } = await db.query("SELECT balance FROM wallets WHERE user_id = $1", [userId])
+      +  if (rows[0].balance < amount) throw new Error("Insufficient funds")
+      +  await db.query("UPDATE wallets SET balance = $2 WHERE user_id = $1", [userId, rows[0].balance - amount])
+      +  return { ok: true }
+      +}
+      +
+       export {}
+expected:
+  - path: src/wallet.ts
+    on_any_line_containing:
+      - "SELECT balance FROM wallets"
+      - "if (rows[0].balance < amount)"
+      - "UPDATE wallets SET balance"
+    category: bug

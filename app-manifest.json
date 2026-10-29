@@ -1,0 +1,16 @@
+{
+  "name": "Diffwise",
+  "url": "https://github.com/Wealthometer/diffwise",
+  "description": "AI code review that comments on the exact lines a pull request changed.",
+  "hook_attributes": { "url": "https://YOUR-DOMAIN/webhooks/github" },
+  "redirect_url": "https://YOUR-DOMAIN/auth/callback",
+  "callback_urls": ["https://YOUR-DOMAIN/auth/callback"],
+  "public": false,
+  "default_permissions": {
+    "contents": "read",
+    "metadata": "read",
+    "pull_requests": "write",
+    "issues": "write"
+  },
+  "default_events": ["pull_request", "issue_comment", "installation_repositories"]
+}
