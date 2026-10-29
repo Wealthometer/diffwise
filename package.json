@@ -9,9 +9,9 @@
     "node": ">=22"
   },
   "scripts": {
-    "dev:web": "tsx watch src/main-web.ts",
-    "dev:worker": "tsx watch src/main-worker.ts",
-    "migrate": "tsx src/db/migrate.ts",
+    "dev:web": "tsx watch --env-file=.env src/main-web.ts",
+    "dev:worker": "tsx watch --env-file=.env src/main-worker.ts",
+    "migrate": "tsx --env-file=.env src/db/migrate.ts",
     "build": "tsc -p tsconfig.build.json",
     "start:web": "node dist/main-web.js",
     "start:worker": "node dist/main-worker.js",
