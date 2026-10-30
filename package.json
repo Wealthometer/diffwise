@@ -15,6 +15,7 @@
     "build": "tsc -p tsconfig.build.json",
     "start:web": "node dist/main-web.js",
     "start:worker": "node dist/main-worker.js",
+    "start:all": "node dist/main-all.js",
     "start:migrate": "node dist/db/migrate.js",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",

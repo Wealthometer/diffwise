@@ -22,14 +22,16 @@ async function upsertInstallation(c: PoolClient, inst: Installation) {
   )
 }
 
+// One statement for all repos: an "All repositories" install can list hundreds, and GitHub
+// abandons a webhook delivery after 10 seconds.
 async function upsertRepos(c: PoolClient, installationId: number, repos: Repo[]) {
-  for (const r of repos) {
-    await c.query(
-      `INSERT INTO repositories (id, installation_id, full_name, private) VALUES ($1, $2, $3, $4)
-       ON CONFLICT (id) DO UPDATE SET full_name = EXCLUDED.full_name, installation_id = EXCLUDED.installation_id`,
-      [r.id, installationId, r.full_name, r.private ?? false],
-    )
-  }
+  if (repos.length === 0) return
+  await c.query(
+    `INSERT INTO repositories (id, installation_id, full_name, private)
+     SELECT id, $1, full_name, private FROM unnest($2::bigint[], $3::text[], $4::boolean[]) AS t(id, full_name, private)
+     ON CONFLICT (id) DO UPDATE SET full_name = EXCLUDED.full_name, installation_id = EXCLUDED.installation_id`,
+    [installationId, repos.map((r) => r.id), repos.map((r) => r.full_name), repos.map((r) => r.private ?? false)],
+  )
 }
 
 async function queueReview(

@@ -1,0 +1,40 @@
+# Render Blueprint: web server and worker in one free web service (src/main-all.ts).
+# Use an external Postgres (e.g. Supabase's session pooler URL); Render's free Postgres expires.
+# Free services sleep when idle, and GitHub drops webhooks that take over 10s, so ping
+# /health every ~10 minutes with an uptime monitor to keep it awake.
+services:
+  - type: web
+    name: diffwise
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    dockerCommand: sh -c "node dist/db/migrate.js && exec node dist/main-all.js"
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: COOKIE_SECURE
+        value: "true"
+      - key: WORKER_CONCURRENCY
+        value: "2"
+      # Set these in the Render dashboard when creating the Blueprint.
+      - key: PUBLIC_URL # https://<service>.onrender.com
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: SESSION_SECRET
+        sync: false
+      - key: GITHUB_APP_ID
+        sync: false
+      - key: GITHUB_APP_SLUG
+        sync: false
+      - key: GITHUB_PRIVATE_KEY
+        sync: false
+      - key: GITHUB_WEBHOOK_SECRET
+        sync: false
+      - key: GITHUB_CLIENT_ID
+        sync: false
+      - key: GITHUB_CLIENT_SECRET
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
