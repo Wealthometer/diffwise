@@ -45,9 +45,12 @@ details summary{cursor:pointer;color:var(--ink2);font-size:14px;margin:6px 0}
 @media (max-width:700px){.hide-sm{display:none}td,th{padding:8px 10px}.hero h1{font-size:30px}}
 `
 
+/** The header logo's "+−" as a tab icon: dark tile so it reads on light and dark browser chrome. */
+export const FAVICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="7" fill="#0d1117"/><path d="M10 7v10M5 12h10" stroke="#2ea043" stroke-width="3.2" stroke-linecap="round"/><path d="M17 23h10" stroke="#f85149" stroke-width="3.2" stroke-linecap="round"/></svg>`
+
 export function layout(opts: { title: string; user?: { login: string; avatar_url: string | null } | null; body: Raw }): string {
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>${esc(opts.title)} · Diffwise</title><style>${CSS}</style></head><body>
+<title>${esc(opts.title)} · Diffwise</title><link rel="icon" href="/favicon.svg" type="image/svg+xml"><style>${CSS}</style></head><body>
 ${html`<header class="top"><div class="bar"><a class="logo" href="/"><b><span class="p">+</span><span class="m">−</span></b>diffwise</a>
 <nav>${opts.user ? html`<a href="/">Reviews</a><a href="/usage">Usage</a><span class="small muted hide-sm">${opts.user.login}</span>${opts.user.avatar_url ? html`<img class="avatar" src="${opts.user.avatar_url}" alt="">` : ""}<a href="/logout">Sign out</a>` : html`<a href="/login">Sign in with GitHub</a>`}</nav></div></header>`.value}
 <main>${opts.body.value}</main></body></html>`

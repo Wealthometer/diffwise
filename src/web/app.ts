@@ -10,7 +10,7 @@ import { verifySignature } from "../github/webhooks.js"
 import { logger } from "../logger.js"
 import { queueStats } from "../queue/queue.js"
 import { seal, unseal } from "./session.js"
-import { html, layout, raw, timeAgo } from "./views.js"
+import { FAVICON_SVG, html, layout, raw, timeAgo } from "./views.js"
 
 type SessionUser = { id: number; login: string; avatar_url: string | null }
 const SESSION = "dw_session"
@@ -78,6 +78,12 @@ export async function buildApp() {
       return result
     })
   })
+
+  // ── Favicon ──────────────────────────────────────────────────────────────
+  // Browsers also request /favicon.ico on their own, so answer it rather than 404.
+  for (const path of ["/favicon.svg", "/favicon.ico"]) {
+    app.get(path, async (_req, reply) => reply.type("image/svg+xml").header("cache-control", "public, max-age=86400").send(FAVICON_SVG))
+  }
 
   // ── Health ───────────────────────────────────────────────────────────────
   app.get("/health", async () => ({ ok: true }))
